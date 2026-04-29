@@ -5,12 +5,12 @@ import {
 } from "firebase/firestore";
 import { db } from "./firebase";
 
-// ── Palette & Theme (Premium Pastel Edition) ─────────────────────────────
+// ── Palette & Theme (Warm Premium Pastel Edition) ────────────────────────
 const C = {
-  bg: "#fffcfb", white: "#ffffff", border: "#f7d7c4", peach: "#f4a58a",
-  peachDark: "#e8845e", blueSoft: "#e0f2fe", creamSoft: "#fff7ed",
-  pastelYellow: "#fffdf0", pastelPurple: "#f9f5ff",
-  text: "#4a2c2a", textSoft: "#8c6d6a", success: "#34d399", warning: "#fbbf24", danger: "#f87171",
+  bg: "#fffaf5", white: "#ffffff", border: "#fce2c4", peach: "#fc9d7a",
+  peachDark: "#df6c47", blueSoft: "#e8f4ea", creamSoft: "#fff6eb",
+  pastelYellow: "#fff8e1", pastelPurple: "#fdf4ff",
+  text: "#5c3d3a", textSoft: "#967c7a", success: "#34d399", warning: "#fbbf24", danger: "#f87171",
   purpleDark: "#701a75"
 };
 
@@ -62,7 +62,7 @@ function parseAiText(text) {
 export default function BabyApp() {
   const [events, setEvents] = useState([]);
   const [tab, setTab] = useState("home");
-  const [userName] = useState(() => localStorage.getItem("baby_username") || "אבא");
+  const [userName] = useState(() => localStorage.getItem("baby_username") || "הורים");
   const [modal, setModal] = useState(null);
   const [now, setNow] = useState(Date.now());
   const [showUndo, setShowUndo] = useState(false);
@@ -126,12 +126,11 @@ export default function BabyApp() {
 
       {/* Header */}
       <div style={S.headerContainer}>
-        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: 8, marginBottom: 10}}>
-          <div style={S.greeting}>שלום {userName} 👋</div>
-          <div className="kids-font" style={S.babyBadge}>עלמה 🌸</div>
+        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 10}}>
+          <div className="kids-font" style={S.babyBadge}>לני 🧸</div>
         </div>
         
-        <NetaTicker now={now} />
+        <SapirTicker now={now} />
 
         <div style={{display: 'flex', gap: 10, marginBottom: 12}}>
           <TaskButton 
@@ -165,7 +164,7 @@ export default function BabyApp() {
       <button onClick={() => setModal("ai")} style={S.aiFab}>🍼</button>
 
       <div style={S.nav}>
-        <button onClick={() => setTab("home")} style={S.navBtn(tab === "home")}>🏠 ALMA</button>
+        <button onClick={() => setTab("home")} style={S.navBtn(tab === "home")}>🏠 LENNY</button>
         <button onClick={() => setTab("analytics")} style={S.navBtn(tab === "analytics")}>📊 נתונים</button>
       </div>
 
@@ -231,7 +230,9 @@ function SmartLogModal({ onConfirm, onClose }) {
       const exactTs = Date.now() - ((data.minutesAgo || 0) * 60000);
       const eventToSave = { type: data.type, ts_override: exactTs };
       
-      if (data.type === "feed") eventToSave.ml = data.ml;
+      if (data.type === "feed") {
+        eventToSave.ml = data.ml || 60; // ברירת מחדל
+      }
       if (data.type === "diaper") {
         eventToSave.pee = data.pee !== undefined ? data.pee : true; 
         eventToSave.poop = data.poop || false;
@@ -250,7 +251,7 @@ function SmartLogModal({ onConfirm, onClose }) {
       <div style={{...S.modal, textAlign: 'center'}} onClick={e=>e.stopPropagation()}>
         <h3 className="kids-font" style={{color: C.peachDark, margin: '0 0 20px', fontSize: 24}}>הזנה חכמה 🎙️</h3>
         <p style={{fontSize: 14, color: C.textSoft, marginBottom: 20}}>
-          לחץ על המיקרופון ודבר, או פשוט הקלד. <br/>למשל: "עלמה אכלה 60 מיל ב-10 בבוקר" או "החלפנו קקי לפני רבע שעה".
+          לחץ על המיקרופון ודבר, או פשוט הקלד. <br/>למשל: "לני אכל 120 מיל ב-10 בבוקר" או "החלפנו קקי לפני רבע שעה".
         </p>
 
         <div style={{display: 'flex', justifyContent: 'center', marginBottom: 20}}>
@@ -320,159 +321,102 @@ function TaskButton({ icon, text, done, bgColor, textColor, onClick }) {
   );
 }
 
-// ── Neta Cheeky Compliment Ticker ──────────────────────────────────────────
-function NetaTicker({ now }) {
+// ── Sapir Cheeky Compliment Ticker ──────────────────────────────────────────
+function SapirTicker({ now }) {
   const [manualOffset, setManualOffset] = useState(0);
 
   const compliments = [
-    "נטע, לכי לנוח. עכשיו תורו של אסף, שיעשה קצת פאנלים.",
-    "נטע, ברור שאת עייפה. לסחוב את אסף על הגב כל היום זה מעייף.",
-    "נטע, שימי רגליים למעלה. אם עלמה בוכה - אסף קם. זה החוק.",
-    "נטע, את נראית מיליון דולר. אסף? נו, לפחות הוא מנסה.",
-    "נטע, תזכירי לאסף שהוא העוזר מנכ״ל פה. את הבוסית.",
-    "נטע, ינאי ועלמה זכו. אסף פשוט שדד את הבנק המרכזי.",
-    "נטע, אסף אמור לשטוף כלים עכשיו, למה הוא מסתכל באפליקציה?",
-    "נטע, תעבירי לאסף את השרביט, מגיע לך לישון איזה יומיים.",
-    "נטע, גם כשאת בפיג'מה את לוקחת את אסף בהליכה.",
-    "נטע, אם אסף מצייץ היום, תגידי לו שהאלגוריתם קבע שאת צודקת.",
-    "נטע, תודיעי לאסף שהמשמרת שלו מתחילה. ביי.",
-    "נטע, ישירות ממסד הנתונים: אסף חב לך את חייו.",
-    "נטע, תני לאסף להחליף את הקקי הזה. את יפה מדי בשביל זה.",
-    "נטע, ינאי יצא חכם בזכותך. אם הוא יעשה שטויות - זה מאסף.",
-    "נטע, אסף יודע שצריך להקים לך מקדש בסלון?",
-    "נטע, תגידי לאסף שיכין לך קפה, ושיזהר לא לשרוף אותו.",
-    "נטע, עשית מספיק להיום. שאסף ייקח פיקוד על הכאוס.",
-    "נטע, איך את אמא לשניים ועדיין נראית פצצה? אסף צריך להודות לאל.",
-    "נטע, תרימי ת'רגליים ותשלחי את אסף להביא לך משהו מתוק.",
-    "נטע, את גורמת לאימהות להיראות קל. אסף גורם לזה להיראות קשה.",
-    "נטע, תשלחי את אסף לעשות כביסה. מגיע לך זמן לעצמך.",
-    "נטע, עלמה חייכה? זה כי היא ראתה אותך. אסף רק הצחיק אותה בטעות.",
-    "נטע, השלטון בבית הזה לגמרי שלך. אסף רק עובד פה.",
-    "נטע, תזכירי לאסף שהתפקיד שלו זה להגיד 'כן, חיים שלי'.",
-    "נטע, את ההוכחה ששלמות קיימת. אסף הוא ההוכחה שניסים קורים.",
-    "נטע, לכי לישון. אם הבית עולה באש, שאסף יכבה.",
-    "נטע, אסף בטוח חושב שהוא המציא את האפליקציה הזו, אבל שנינו יודעים בשביל מי היא.",
-    "נטע, תקראי לאסף שיעשה לך פאנלים. הרצפה לא תבריק מעצמה.",
-    "נטע, רק מומחית כמוך יכולה לנהל את ינאי, עלמה ואסף במקביל.",
-    "נטע, את המוח, הלב והיופי של הבית. אסף אחראי על הזבל.",
-    "נטע, אמא מושלמת. אישה מושלמת. ואסף... נמצא שם בסביבה.",
-    "נטע, תזכורת לאסף: אשתך פצצה. תתנהג בהתאם.",
-    "נטע, אם אסף מעצבן אותך, תלחצי פה דאבל קליק ואני אמחק לו נתונים.",
-    "נטע, תודי שזה קורע לראות את אסף מנסה להרדים את עלמה.",
-    "נטע, אסף עשה לך מסאז' היום? אם לא, זו עילה משפטית.",
-    "נטע, את שולטת בבית הזה ביד רמה. אסף הוא כוח העזר שלך.",
-    "נטע, תעשי קליק עם האצבע ואסף אמור לקפוץ. נסי את זה עכשיו.",
-    "נטע, הכלים בכיור קוראים לאסף. שחררי אותם.",
-    "נטע, אני שוקל להוסיף כפתור 'השתק אסף' רק בשבילך.",
-    "נטע, תזכרי: עלמה התינוקת, ינאי הפעוט, ואסף הילד הגדול. סבלנות.",
-    "נטע, אסף אמר שהוא 'עוזר' בבית? תתקני אותו: הוא 'גר' בבית, שיעבוד.",
-    "נטע, עשית היום קסמים. אסף מקסימום העלים עוגייה.",
-    "נטע, אין ספק שאת אשת השנה. אסף יכול להיות סגן שני אולי.",
-    "נטע, גם כשאת קמה הפוכה את מדהימה. שאסף ילמד משהו.",
-    "נטע, לכי למקלחת ארוכה. אסף שומר על המבצר (נקווה שלא יהרוס).",
-    "נטע, את הבוסית של הפרויקט. אסף הוא עובד קבלן זמני.",
-    "נטע, סטטיסטית, אסף צודק רק כשהוא מסכים איתך.",
-    "נטע, זה חוקי להיות כזו מהממת אחרי לידה? תשאלי את אסף.",
-    "נטע, עלמה בוכה. אסף - למשמרת. נטע - לשנ״צ.",
-    "נטע, ידעת שאסף התחנן אליי שאכתוב לך פה דברים יפים? הוא מפחד ממך.",
-    "נטע, תנוחי. אני עושה לאסף ביקורת פתע על ההחתלות שלו.",
-    "נטע, את הלביאה. אסף במקרה הטוב הוא פומה שמנמנה.",
-    "נטע, ינאי ועלמה יצאו מושלמים. מזל שהגנים שלך חזקים יותר משל אסף.",
-    "נטע, תודיעי לאסף שהיום בערב מזמינים אוכל. פטור מבישולים בשבילך.",
-    "נטע, את מנהלת אופרציה שלמה. אסף מתקשה למצוא את הגרביים שלו.",
-    "נטע, אין עלייך ביקום. אסף פשוט תפס טרמפ על ההצלחה שלך.",
-    "נטע, תזכרי שאסף אוהב אותך. במיוחד כשאת מסדרת אחריו.",
-    "נטע, שבי רגע. אסף צריך להכין לך עכשיו כוס יין.",
-    "נטע, האנרגיות שלך מחזיקות את הבית. אסף סתם צורך חשמל.",
-    "נטע, ראיתי את נתוני ההחתלות. אסף משתרך מאחור. תני לו בראש.",
-    "נטע, את מהממת ברמות. אסף, תרשום הערות.",
-    "נטע, גם סופרוומן נחה לפעמים. תעבירי לאסף את הגלימה.",
-    "נטע, אל תעשי שום דבר שאסף יכול לעשות במקומך. שזה הכל בערך.",
-    "נטע, רק אומר: אסף פוחד ממך מספיק כדי לבקש ממני להרים לך.",
-    "נטע, את המקור לכל מה שטוב בבית הזה. אסף שם בשביל התפאורה.",
-    "נטע, איזה כיף לאסף שיש לו אותך. איזה כיף לך שיש לך... נטפליקס.",
-    "נטע, תגידי לאסף שיתחיל לפצות על הלילות הלבנים שלך. ביהלומים.",
-    "נטע, מיכל מי? נטע היא המלכה האמיתית של הבית הזה.",
-    "נטע, הנה רעיון: אסף יקום הלילה, ואת תשני עד 10. סגרנו?",
-    "נטע, ששש... אל תפריעי לעצמך לנוח. שאסף ישבור ת'ראש עם הילדים.",
-    "נטע, את נראית וואו. אסף צריך לשים משקפי שמש.",
-    "נטע, אם אסף שואל, השעה עכשיו 'זמן של נטע'. שילך לחפש.",
-    "נטע, את עושה הכל כל כך בסטייל, אסף סתם מפריע לפריים.",
-    "נטע, ינאי למד לדבר יפה בזכותך. השטויות זה מאסף.",
-    "נטע, תזכרי שמגיע לך הכל. אסף כאן כדי להגיש לך את זה.",
-    "נטע, רק מלהסתכל על המשימות שלך אני מתעייף. שאסף יחליף אותך קצת.",
-    "נטע, אסף יודע שבלעדייך הוא היה חי על פיתות קפואות?",
-    "נטע, תודי שזה כיף לתת לאסף פקודות. אל תפסיקי.",
-    "נטע, את גורמת לשלמות להיראות זמינה לכל דורש. אסף זכה.",
-    "נטע, האפליקציה הזו קיימת רק כדי לוודא שאסף עושה משהו בבית.",
-    "נטע, אם אסף מתלונן שעייף לו, תזכירי לו מה זה ללדת.",
-    "נטע, כל יום שאת לא מפטרת את אסף מהתפקיד שלו, זה יום של חסד.",
-    "נטע, תשאירי לאסף את העבודה השחורה. את נסיכה.",
-    "נטע, איך את מחזיקה מעמד ככה? מדהימה. אסף - קח דוגמה.",
-    "נטע, כולם יודעים שאת הבוס. אל תתני לאסף לחשוב אחרת.",
-    "נטע, קחי לעצמך רגע. אסף במילא לא ישים לב אם הבית יתהפך.",
-    "נטע, סטטיסטית, את עושה פי 8 מאסף. הגיע הזמן להשוות תנאים.",
-    "נטע, את מהממת גם כשאת כועסת. אסף יודע את זה הכי טוב.",
-    "נטע, תשתי קפה בשקט. אסף יכול לאסוף את הצעצועים מהרצפה.",
-    "נטע, הלב הענק שלך מכיל את כולם. במיוחד את השטויות של אסף.",
-    "נטע, כל פעם שעלמה עושה קקי גב, תברחי. שאסף יטפל בזה.",
-    "נטע, תגידי לאסף שייקח את ינאי לגינה. יש לך שעת שקט עכשיו.",
-    "נטע, את חכמה, יפה ומוכשרת. ואסף... ובכן, לאסף יש מזל.",
-    "נטע, האנרגיות שלך זה קסם. שאסף יטעין את עצמו ממך.",
-    "נטע, לא משנה מה אסף עושה, ברור שאת היית עושה את זה יותר טוב.",
-    "נטע, תני לאסף לשטוף את הבקבוקים. הם לא ינקו את עצמם.",
-    "נטע, יום חג לאומי: נטע קמה. אסף - תפרוס שטיח אדום.",
-    "נטע, את הפנינה של הבית. אסף הוא מקסימום הפלסטיק שעוטף אותה.",
-    "נטע, תשבי, תשתי קפה, תסתכלי על אסף עובד. איזה תענוג.",
-    "נטע, איזה מזל שיש להם אותך. כי אם אסף היה האחראי... אלוהים ישמור.",
-    "נטע, את מריצה פה אימפריה. אסף הוא הפקיד הזוטר.",
-    "נטע, אני רואה את הנתונים: אסף מתעצל היום. תעירי אותו.",
-    "נטע, לנהל ילדים ואת אסף זו עבודה לשלושה אנשים. את אלופה.",
-    "נטע, תזכירי לאסף שמגיע לך מסאז' לפחות פעם ביום.",
-    "נטע, פשוט תהיי פה מהממת. אסף כבר יעשה את כל השאר (אני מקווה).",
-    "נטע, עלמה עשתה קקי? הנה ההזדמנות של אסף להוכיח את עצמו.",
-    "נטע, את סוחבת הכל בסטייל. אסף מתלונן כשהוא סוחב שקית מהסופר.",
-    "נטע, מדהים לראות כמה שאת שולטת בבלאגן. אסף סתם עושה רעש.",
-    "נטע, לכי לישון. התירוץ של אסף נגמר. הוא בתורנות.",
-    "נטע, ינאי ועלמה ברי מזל. אסף עוד יותר. פשוט תשנני לו את זה.",
-    "נטע, מגיע לך פרס ישראל על זה שאת סובלת את כל הבלאגן הזה (ואת אסף).",
-    "נטע, תודיעי לאסף שהחל מעכשיו, כל החתלה שווה לו נקודות זכות.",
-    "נטע, תרימי את הרגליים ותני לאסף להתרוצץ קצת. זה בריא לו.",
-    "נטע, את תמיד צודקת, גם כשאת לא. אסף, תכתוב את זה על הלוח.",
-    "נטע, אין ספק שאת המוח המבצע. אסף סתם עושה קולות של עובד.",
-    "נטע, את מלכה 👑 אסף יכול להחזיק את המניפה.",
-    "נטע, כל השכונה יודעת שבלעדייך הבית הזה קורס. אסף מודע לזה?",
-    "נטע, איזה כיף לראות את אסף מנסה להבין מה לעשות. תני לו להזיע.",
-    "נטע, עשית מספיק. אסף, הגיע הזמן לפתוח את ארנק הפינוקים לנטע.",
-    "נטע, כולם יודעים שאת הגרסה המוצלחת של הזוגיות הזאת.",
-    "נטע, אם אסף עושה טעות, פשוט תראי לו את המסך הזה.",
-    "נטע, אפילו כאלגוריתם, יש לי קראש על איך שאת מתקתקת עניינים.",
-    "נטע, אסף ביקש פיצ'ר שמשתיק את ההתראות. חסמתי אותו. את הבוס.",
-    "נטע, אסף מחכה לפקודה. מה המשימה הבאה שלו?",
-    "נטע, יפה לך אימהות. אסף נראה כאילו הוא אחרי קרב הישרדות.",
-    "נטע, תכיני לעצמך תה, אסף ישמור על הילדים. מה כבר יכול לקרות?",
-    "נטע, את מצחיקה אותי יותר מאסף. והוא עוד מנסה.",
-    "נטע, כולם יודעים שהמשפחה הזו תלויה לך על הכתפיים המהממות שלך.",
-    "נטע, את גורמת ל'אמא עייפה' להיראות כמו טרנד של גוצ'י.",
-    "נטע, תגידי לאסף שאם הוא רוצה חיוך ממך, שיתחיל לקפל כביסה.",
-    "נטע, אל תתני לאסף לשכנע אותך שהוא עייף. את לוקחת אותו בסיבוב.",
-    "נטע, עלמה עשתה פיפי. אסף לטיפולך, נטע להמשך מנוחה.",
-    "נטע, בחיים לא ראיתי עבודת ניהול כזו מרשימה. אסף סתם בובה.",
-    "נטע, את הבוס, המנכ״ל והיו״ר. אסף אחראי על הפח.",
-    "נטע, יש לך את האישור שלי להתעלם מאסף בשעה הקרובה. לכי לנוח.",
-    "נטע, רק המחשבה על מה שאת עושה ביום מעייפת אותי. שאסף יעשה משהו!",
-    "נטע, תודיעי לאסף שהיום בלילה התור שלו לפזם את 'שן ילדי'.",
-    "נטע, תזכרי שאת מלכה, גם אם אסף שכח להגיד לך את זה היום.",
-    "נטע, הכל בשליטה שלך. אסף רק חושב שהוא מחליט משהו.",
-    "נטע, ינאי מתוק בזכותך. אם הוא מרביץ, זה הגנים של אסף.",
-    "נטע, מגיע לך חופשה באיים המלדיביים. אסף, תשלוף את האשראי.",
-    "נטע, תסלחי לאסף, הוא פשוט לא עומד בקצב המושלם שלך.",
-    "נטע, קחי לך רגע. הבית לא יברח, ואסף... ננסה לא לאבד אותו.",
-    "נטע, עשית היום בית ספר לכולם. במיוחד לאסף.",
-    "נטע, תזכורת אחרונה להיום: הבית של נטע, השאר רק מתארחים פה.",
-    "נטע, אסף עשה משהו מועיל היום? אם לא, זה הזמן להפעיל אותו.",
-    "נטע, הטיקר הזה פה רק כדי לעצבן את אסף ולהרים לך. תיהני.",
-    "נטע, לסיכום: את מדהימה. אסף נסבל. שיהיה לכם יום מקסים! ❤️"
+    "ספיר, לכי לנוח. עכשיו תורו של טאי, שיעשה קצת פאנלים.",
+    "ספיר, ברור שאת עייפה. לסחוב את טאי על הגב כל היום זה מעייף.",
+    "ספיר, שימי רגליים למעלה. אם לני בוכה - טאי קם. זה החוק.",
+    "ספיר, את נראית מיליון דולר. טאי? נו, לפחות הוא מנסה.",
+    "ספיר, תזכירי לטאי שהוא העוזר מנכ״ל פה. את הבוסית.",
+    "ספיר, לני פשוט זכה בך. טאי פשוט שדד את הבנק המרכזי.",
+    "ספיר, טאי אמור לשטוף כלים עכשיו, למה הוא מסתכל באפליקציה?",
+    "ספיר, תעבירי לטאי את השרביט, מגיע לך לישון איזה יומיים.",
+    "ספיר, גם כשאת בפיג'מה את לוקחת את טאי בהליכה.",
+    "ספיר, אם טאי מצייץ היום, תגידי לו שהאלגוריתם קבע שאת צודקת.",
+    "ספיר, תודיעי לטאי שהמשמרת שלו מתחילה. ביי.",
+    "ספיר, ישירות ממסד הנתונים: טאי חב לך את חייו.",
+    "ספיר, תני לטאי להחליף את הקקי הזה. את יפה מדי בשביל זה.",
+    "ספיר, לני יצא מתוק בזכותך. אם הוא יעשה שטויות - זה מטאי.",
+    "ספיר, טאי יודע שצריך להקים לך מקדש בסלון?",
+    "ספיר, תגידי לטאי שיכין לך קפה, ושיזהר לא לשרוף אותו.",
+    "ספיר, עשית מספיק להיום. שטאי ייקח פיקוד על הכאוס.",
+    "ספיר, איך את אמא ועדיין נראית פצצה? טאי צריך להודות לאל.",
+    "ספיר, תרימי ת'רגליים ותשלחי את טאי להביא לך משהו מתוק.",
+    "ספיר, את גורמת לאימהות להיראות קל. טאי גורם לזה להיראות קשה.",
+    "ספיר, תשלחי את טאי לעשות כביסה. מגיע לך זמן לעצמך.",
+    "ספיר, לני חייך? זה כי הוא ראה אותך. טאי רק הצחיק אותו בטעות.",
+    "ספיר, השלטון בבית הזה לגמרי שלך. טאי רק עובד פה.",
+    "ספיר, תזכירי לטאי שהתפקיד שלו זה להגיד 'כן, חיים שלי'.",
+    "ספיר, את ההוכחה ששלמות קיימת. טאי הוא ההוכחה שניסים קורים.",
+    "ספיר, לכי לישון. אם הבית עולה באש, שטאי יכבה.",
+    "ספיר, טאי בטוח חושב שהוא המציא את האפליקציה הזו, אבל שנינו יודעים בשביל מי היא.",
+    "ספיר, תקראי לטאי שיעשה לך פאנלים. הרצפה לא תבריק מעצמה.",
+    "ספיר, רק מומחית כמוך יכולה לנהל את לני ואת טאי במקביל.",
+    "ספיר, את המוח, הלב והיופי של הבית. טאי אחראי על הזבל.",
+    "ספיר, אמא מושלמת. אישה מושלמת. וטאי... נמצא שם בסביבה.",
+    "ספיר, תזכורת לטאי: אשתך פצצה. תתנהג בהתאם.",
+    "ספיר, אם טאי מעצבן אותך, תלחצי פה דאבל קליק ואני אמחק לו נתונים.",
+    "ספיר, תודי שזה קורע לראות את טאי מנסה להרדים את לני.",
+    "ספיר, טאי עשה לך מסאז' היום? אם לא, זו עילה משפטית.",
+    "ספיר, את שולטת בבית הזה ביד רמה. טאי הוא כוח העזר שלך.",
+    "ספיר, תעשי קליק עם האצבע וטאי אמור לקפוץ. נסי את זה עכשיו.",
+    "ספיר, הכלים בכיור קוראים לטאי. שחררי אותם.",
+    "ספיר, אני שוקל להוסיף כפתור 'השתק טאי' רק בשבילך.",
+    "ספיר, תזכרי: לני התינוק וטאי הילד הגדול. סבלנות.",
+    "ספיר, טאי אמר שהוא 'עוזר' בבית? תתקני אותו: הוא 'גר' בבית, שיעבוד.",
+    "ספיר, עשית היום קסמים. טאי מקסימום העלים עוגייה.",
+    "ספיר, אין ספק שאת אשת השנה. טאי יכול להיות סגן שני אולי.",
+    "ספיר, גם כשאת קמה הפוכה את מדהימה. שטאי ילמד משהו.",
+    "ספיר, לכי למקלחת ארוכה. טאי שומר על המבצר.",
+    "ספיר, את הבוסית של הפרויקט. טאי הוא עובד קבלן זמני.",
+    "ספיר, סטטיסטית, טאי צודק רק כשהוא מסכים איתך.",
+    "ספיר, לני בוכה. טאי - למשמרת. ספיר - לשנ״צ.",
+    "ספיר, תנוחי. אני עושה לטאי ביקורת פתע על ההחתלות שלו.",
+    "ספיר, את הלביאה. טאי במקרה הטוב הוא פומה שמנמנה.",
+    "ספיר, לני יצא מושלם. מזל שהגנים שלך חזקים יותר משל טאי.",
+    "ספיר, תודיעי לטאי שהיום בערב מזמינים אוכל. פטור מבישולים.",
+    "ספיר, את מנהלת אופרציה שלמה. טאי מתקשה למצוא את הגרביים שלו.",
+    "ספיר, תזכרי שטאי אוהב אותך. במיוחד כשאת מסדרת אחריו.",
+    "ספיר, שבי רגע. טאי צריך להכין לך עכשיו כוס יין.",
+    "ספיר, ראיתי את נתוני ההחתלות. טאי משתרך מאחור. תני לו בראש.",
+    "ספיר, גם סופרוומן נחה לפעמים. תעבירי לטאי את הגלימה.",
+    "ספיר, אל תעשי שום דבר שטאי יכול לעשות במקומך.",
+    "ספיר, רק אומר: טאי פוחד ממך מספיק כדי לבקש ממני להרים לך.",
+    "ספיר, איזה כיף לטאי שיש לו אותך. איזה כיף לך שיש לך... נטפליקס.",
+    "ספיר, הנה רעיון: טאי יקום הלילה, ואת תשני עד 10. סגרנו?",
+    "ספיר, ששש... אל תפריעי לעצמך לנוח. שטאי ישבור ת'ראש.",
+    "ספיר, את נראית וואו. טאי צריך לשים משקפי שמש.",
+    "ספיר, לני למד להיות חמוד בזכותך. השטויות זה מטאי.",
+    "ספיר, תזכרי שמגיע לך הכל. טאי כאן כדי להגיש לך את זה.",
+    "ספיר, טאי יודע שבלעדייך הוא היה חי על פיתות קפואות?",
+    "ספיר, תודי שזה כיף לתת לטאי פקודות. אל תפסיקי.",
+    "ספיר, אם טאי מתלונן שעייף לו, תזכירי לו מה זה ללדת.",
+    "ספיר, כל יום שאת לא מפטרת את טאי מהתפקיד שלו, זה יום של חסד.",
+    "ספיר, תשאירי לטאי את העבודה השחורה. את נסיכה.",
+    "ספיר, כולם יודעים שאת הבוס. אל תתני לטאי לחשוב אחרת.",
+    "ספיר, קחי לעצמך רגע. טאי במילא לא ישים לב אם הבית יתהפך.",
+    "ספיר, את מהממת גם כשאת כועסת. טאי יודע את זה הכי טוב.",
+    "ספיר, תשתי קפה בשקט. טאי יכול לאסוף את הצעצועים מהרצפה.",
+    "ספיר, כל פעם שלני עושה קקי גב, תברחי. שטאי יטפל בזה.",
+    "ספיר, את חכמה, יפה ומוכשרת. ולטאי... ובכן, לטאי יש מזל.",
+    "ספיר, האנרגיות שלך זה קסם. שטאי יטעין את עצמו ממך.",
+    "ספיר, לא משנה מה טאי עושה, ברור שאת היית עושה את זה יותר טוב.",
+    "ספיר, תני לטאי לשטוף את הבקבוקים. הם לא ינקו את עצמם.",
+    "ספיר, יום חג לאומי: ספיר קמה. טאי - תפרוס שטיח אדום.",
+    "ספיר, אני רואה את הנתונים: טאי מתעצל היום. תעירי אותו.",
+    "ספיר, לנהל את לני ואת טאי זו עבודה לשניים. את אלופה.",
+    "ספיר, תזכירי לטאי שמגיע לך מסאז' לפחות פעם ביום.",
+    "ספיר, פשוט תהיי פה מהממת. טאי כבר יעשה את כל השאר.",
+    "ספיר, לני עשה קקי? הנה ההזדמנות של טאי להוכיח את עצמו.",
+    "ספיר, לכי לישון. התירוץ של טאי נגמר. הוא בתורנות.",
+    "ספיר, לני בר מזל. טאי עוד יותר. פשוט תשנני לו את זה.",
+    "ספיר, תודיעי לטאי שהחל מעכשיו, כל החתלה שווה לו נקודות זכות.",
+    "ספיר, תרימי את הרגליים ותני לטאי להתרוצץ קצת. זה בריא לו.",
+    "ספיר, מגיע לך חופשה באיים המלדיביים. טאי, תשלוף את האשראי.",
+    "ספיר, הטיקר הזה פה רק כדי לעצבן את טאי ולהרים לך. תיהני."
   ];
   
   const baseIndex = Math.floor(now / (1000 * 60 * 60)) % compliments.length;
@@ -485,7 +429,7 @@ function NetaTicker({ now }) {
 
   return (
     <div className="neta-ticker" onDoubleClick={handleDoubleClick} title="לחיצה כפולה לפאנצ' הבא!" style={{ textAlign: 'center', marginBottom: 12 }}>
-      <div style={{ display: 'inline-block', background: 'linear-gradient(135deg, #f9a8d4, #f4a58a)', color: 'white', padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 900, boxShadow: '0 2px 10px rgba(249, 168, 212, 0.4)' }}>
+      <div style={{ display: 'inline-block', background: 'linear-gradient(135deg, #fc9d7a, #df6c47)', color: 'white', padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 900, boxShadow: '0 2px 10px rgba(223, 108, 71, 0.4)' }}>
         {current}
       </div>
     </div>
@@ -503,10 +447,10 @@ function ProactiveTicker({ events, vitaminDone, now }) {
 
   const todayFeeds = events.filter(e => e.type === "feed" && isToday(e.ts));
   const totalMl = todayFeeds.reduce((sum, e) => sum + Number(e.ml || 0), 0);
-  if (totalMl > 500) insights.push({ icon: "📈", text: `אוכלת מעולה היום (${totalMl} מ"ל)`, color: C.success });
+  if (totalMl > 500) insights.push({ icon: "📈", text: `אוכל מעולה היום (${totalMl} מ"ל)`, color: C.success });
 
   if (insights.length === 0) {
-    insights.push({ icon: "✨", text: "הכל מושלם! עלמה במסלול המדויק", color: C.peachDark });
+    insights.push({ icon: "✨", text: "הכל מושלם! לני במסלול המדויק", color: C.peachDark });
   }
 
   const finalInsights = insights.slice(0, 3);
@@ -560,7 +504,7 @@ function MainTimerWidget({ events, now, onOpenForecast }) {
     <div style={S.mainWidget}>
       <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
         <div>
-          <div style={{fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.9)', marginBottom: 0}}>אכלה לפני:</div>
+          <div style={{fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.9)', marginBottom: 0}}>אכל לפני:</div>
           <div className="kids-font" style={{fontSize: 42, fontWeight: 900, color: 'white', textShadow: '0 2px 10px rgba(0,0,0,0.1)', lineHeight: 1}}>🍼 {timeStr}</div>
         </div>
         
@@ -576,7 +520,7 @@ function MainTimerWidget({ events, now, onOpenForecast }) {
   );
 }
 
-// ── Smart Night Forecast Modal (יעד יחיד: 23:15, 7 ארוחות ביום) ────────────
+// ── Smart Night Forecast Modal ──────────────────────────────────────────────
 function ForecastModal({ events, onClose }) {
   const lastFeed = events.find(e => e.type === "feed");
   if (!lastFeed) return null;
@@ -645,10 +589,10 @@ function ForecastModal({ events, onClose }) {
   );
 }
 
-// ── Shift Handoff Modal (משמרת של 4 שעות עם תובנות אקטיביות) ──────────────
+// ── Shift Handoff Modal ───────────────────────────────────────────────────
 function HandoffModal({ events, vitaminDone, bathDone, onClose }) {
   const now = Date.now();
-  const shiftHours = 4; // שונה מ-6 ל-4 לבקשתך
+  const shiftHours = 4;
   const shiftMs = shiftHours * 60 * 60 * 1000;
   const shiftEvents = events.filter(e => (now - e.ts) < shiftMs);
 
@@ -665,7 +609,7 @@ function HandoffModal({ events, vitaminDone, bathDone, onClose }) {
   let todos = [];
   if (peeCount === 0) todos.push("לא הוחלף פיפי במשמרת הקודמת - לבדוק חיתול בהקדם.");
   if (poopCount === 0) todos.push("לא היה קקי ב-4 השעות האחרונות - לשים לב בהחתלות.");
-  if (totalMl < 60) todos.push(`אכלה מעט יחסית (${totalMl} מ"ל) במשמרת - להקפיד על האכלה.`);
+  if (totalMl < 60) todos.push(`אכל מעט יחסית (${totalMl} מ"ל) במשמרת - להקפיד על האכלה.`);
   if (!vitaminDone) todos.push("לא לשכוח לתת ויטמין D (עדיין לא סומן היום).");
   if (lastFeed) todos.push(`יעד משוער להאכלה הבאה: סביב ${fmtTime(lastFeed.ts + 4 * 60 * 60 * 1000)}.`);
 
@@ -692,7 +636,7 @@ function HandoffModal({ events, vitaminDone, bathDone, onClose }) {
                   </div>
                   <div style={{display:'flex', justifyContent:'space-between'}}>
                     <span style={{fontWeight: 800}}>סה"כ במשמרת:</span>
-                    <span style={{fontWeight: 900}}>{totalMl} מ"ל ({feeds.length} מנות)</span>
+                    <span style={{fontWeight: 900}}>{totalMl} מ"ל ({feeds.length} בקבוקים)</span>
                   </div>
                 </>
               ) : <div style={{fontWeight: 800}}>לא תועדו האכלות במשמרת זו.</div>}
@@ -710,7 +654,7 @@ function HandoffModal({ events, vitaminDone, bathDone, onClose }) {
               </div>
               {bathDoneShift && (
                 <div style={{display:'flex', justifyContent:'space-between', borderTop: '1px dotted #cbd5e1', paddingTop: 5, marginTop: 5}}>
-                  <span style={{fontWeight: 800}}>מקלחת 🛁:</span><span style={{fontWeight: 900, color: C.success}}>עשתה היום!</span>
+                  <span style={{fontWeight: 800}}>מקלחת 🛁:</span><span style={{fontWeight: 900, color: C.success}}>עשה היום!</span>
                 </div>
               )}
             </div>
@@ -776,7 +720,7 @@ function HomeView({ events, setModal, onDelete }) {
       </div>
 
       <div style={S.card}>
-        <div className="kids-font" style={S.cardTitle}>היום של עלמה</div>
+        <div className="kids-font" style={S.cardTitle}>היום של לני</div>
         
         <div style={S.summaryDashboard}>
           <div style={S.summaryColLeft}>
@@ -877,7 +821,7 @@ function AnalyticsView({ events }) {
   return (
     <div style={{display:'flex', flexDirection:'column', gap:20}}>
       <div style={S.card}>
-        <div className="kids-font" style={S.cardTitle}>מגמת תזונה</div>
+        <div className="kids-font" style={S.cardTitle}>מגמת תזונה (מ"ל)</div>
         <div style={{ position: 'relative', width: '100%', height: svgHeight, marginTop: 10 }}>
           <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} style={{ width: '100%', height: '100%', overflow: 'visible' }}>
             <defs><linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={C.peach} stopOpacity="0.3"/><stop offset="100%" stopColor={C.peach} stopOpacity="0"/></linearGradient></defs>
@@ -927,6 +871,7 @@ function FeedModal({ onConfirm, onClose }) {
   const [ml, setMl] = useState("");
   const [timeMode, setTimeMode] = useState("now");
   const [manualTime, setManualTime] = useState("");
+  
   return (
     <div style={S.overlay} onClick={onClose}><div style={S.modal} onClick={e=>e.stopPropagation()}>
       <h3 className="kids-font" style={{textAlign:'center', color:C.peachDark, marginBottom: 15}}>האכלה 🍼</h3>
@@ -976,7 +921,7 @@ function DiaperModal({ onConfirm, onClose }) {
 function AiChatModal({ events, vitaminDone, bathDone, onClose }) {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([
-    { role: "ai", text: "היי! אני כאן לעזור. אני מקבלת אלי עכשיו את כל הנתונים של עלמה. איזה ניתוח נתונים, סיכום, או שאלה תרצה שנעבור עליה?" }
+    { role: "ai", text: "היי! אני כאן לעזור. אני מקבלת אלי עכשיו את כל הנתונים של לני. איזה ניתוח נתונים, סיכום, או שאלה תרצה שנעבור עליה?" }
   ]);
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
@@ -1035,7 +980,7 @@ function AiChatModal({ events, vitaminDone, bathDone, onClose }) {
       <div style={{...S.modal, height: '85vh', maxHeight: '800px', display: 'flex', flexDirection: 'column', padding: '20px', maxWidth: 450, margin: '20px'}} onClick={e=>e.stopPropagation()}>
         
         <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom: 15, borderBottom: `1px solid ${C.border}`, paddingBottom: 15}}>
-          <h3 className="kids-font" style={{color:C.peachDark, margin:0, fontSize: 24}}>האנליסטית של עלמה 📈</h3>
+          <h3 className="kids-font" style={{color:C.peachDark, margin:0, fontSize: 24}}>האנליסטית של לני 📈</h3>
           <button onClick={onClose} style={{background:'none', border:'none', fontSize:24, color: C.textSoft, cursor: 'pointer', padding: 0}}>✕</button>
         </div>
 
@@ -1084,7 +1029,7 @@ function AiChatModal({ events, vitaminDone, bathDone, onClose }) {
 const S = {
   app: { position: "fixed", inset: 0, display: "flex", flexDirection: "column", background: C.bg },
   
-  headerContainer: { background: `linear-gradient(135deg, ${C.peach}, #f9a8d4)`, padding: "20px 15px 15px", borderRadius: "0 0 35px 35px", textAlign: "center", boxShadow: "0 8px 25px rgba(232, 121, 249, 0.25)" },
+  headerContainer: { background: `linear-gradient(135deg, ${C.peach}, #e57f5d)`, padding: "20px 15px 15px", borderRadius: "0 0 35px 35px", textAlign: "center", boxShadow: "0 8px 25px rgba(229, 127, 93, 0.25)" },
   greeting: { fontSize: 14, color: "white", fontWeight: 700, opacity: 0.9 },
   babyBadge: { fontSize: 32, color: "white", fontWeight: 800, textShadow: '0 2px 5px rgba(0,0,0,0.1)' },
   
@@ -1112,7 +1057,7 @@ const S = {
   eventTimeRow: { display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', marginBottom: 8 },
   eventTimeText: { fontWeight: 800, fontSize: 13, color: C.textSoft },
   
-  mlEditInput: { width: '100%', border: '1px solid #f1f5f9', background: '#f8fafc', borderRadius: 8, textAlign: 'center', fontWeight: 900, fontSize: 16, padding: '8px 0', color: C.text },
+  mlEditInput: { width: '100%', border: '1px solid #f1f5f9', background: '#f8fafc', borderRadius: 8, textAlign: 'center', fontWeight: 900, fontSize: 14, padding: '8px 0', color: C.text },
   diaperIconsRow: { display: 'flex', justifyContent: 'center', gap: 8, fontSize: 20, padding: '4px 0' },
   
   chainContainer: { display: 'flex', flexDirection: 'column', alignItems: 'center', height: '40px', justifyContent: 'center', position: 'relative' },
